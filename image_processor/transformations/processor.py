@@ -53,14 +53,18 @@ class ImageProcessor:
         
         for filename in os.listdir(self.input_dir):
             if any(filename.lower().endswith(fmt) for fmt in supported_formats):
-                self._process_single_image(
-                    filename,
-                    resize_dimensions,
-                    blur_radius,
-                    sharpen_factor,
-                    contrast_factor,
-                    brightness_factor
-                )
+                try:
+                    self._process_single_image(
+                        filename,
+                        resize_dimensions,
+                        blur_radius,
+                        sharpen_factor,
+                        contrast_factor,
+                        brightness_factor
+                    )
+                except Exception as e:
+                    logger.error(f"Error processing {filename}: {str(e)}")
+                    continue  # Continue with next image
 
     def _process_single_image(self,
                             filename: str,

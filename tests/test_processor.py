@@ -25,8 +25,8 @@ class TestImageProcessor(unittest.TestCase):
         
     def tearDown(self):
         """Clean up test environment."""
-        shutil.rmtree(self.input_dir)
-        shutil.rmtree(self.output_dir)
+        shutil.rmtree(self.input_dir, ignore_errors=True)
+        shutil.rmtree(self.output_dir, ignore_errors=True)
         
     def _create_test_image(self, path, size=(100, 100), color=(255, 0, 0)):
         """Create a test image with the specified size and color."""
@@ -58,20 +58,27 @@ class TestImageProcessor(unittest.TestCase):
             
     def test_error_handling(self):
         """Test that errors are handled properly."""
+        # Create a test image
+        valid_image_path = os.path.join(self.input_dir, "valid.jpg")
+        self._create_test_image(valid_image_path)
+        
         # Create an invalid image file
         invalid_image_path = os.path.join(self.input_dir, "invalid.jpg")
         with open(invalid_image_path, "w") as f:
             f.write("This is not a valid image file")
             
+        # Remove test_image.jpg created in setUp
+        os.remove(self.test_image_path)
+            
         processor = ImageProcessor(self.input_dir, self.output_dir)
         
         # The processor should handle the error and continue processing valid images
-        with self.assertRaises(Exception):
-            processor.process_images()
+        processor.process_images()
             
         # Check that the valid image was still processed
         output_files = os.listdir(self.output_dir)
         self.assertEqual(len(output_files), 1)
+        self.assertTrue(any("valid" in f for f in output_files))
         
 if __name__ == "__main__":
     unittest.main()
