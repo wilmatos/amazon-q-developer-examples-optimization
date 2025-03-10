@@ -6,10 +6,21 @@ import argparse
 import logging
 import os
 import sys
+from datetime import datetime
 from typing import List, Optional, Tuple
 
 from image_processor.transformations.processor import ImageProcessor
 from image_processor.utils.logger import setup_logger
+from image_processor.profiling.profiler import ProcessingProfiler
+
+def get_default_paths():
+    """Get default paths for input, output, and reports directories."""
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+    return {
+        'input': os.path.join(base_dir, 'data', 'input'),
+        'output': os.path.join(base_dir, 'data', 'output'),
+        'reports': os.path.join(base_dir, 'reports')
+    }
 
 def parse_args(args: Optional[List[str]] = None) -> argparse.Namespace:
     """
@@ -21,6 +32,8 @@ def parse_args(args: Optional[List[str]] = None) -> argparse.Namespace:
     Returns:
         Parsed arguments
     """
+    default_paths = get_default_paths()
+    
     parser = argparse.ArgumentParser(
         description="Process images with various transformations",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
@@ -28,14 +41,20 @@ def parse_args(args: Optional[List[str]] = None) -> argparse.Namespace:
     
     parser.add_argument(
         "-i", "--input-dir",
-        required=True,
+        default=default_paths['input'],
         help="Directory containing input images"
     )
     
     parser.add_argument(
         "-o", "--output-dir",
-        required=True,
+        default=default_paths['output'],
         help="Directory for processed images"
+    )
+    
+    parser.add_argument(
+        "--reports-dir",
+        default=default_paths['reports'],
+        help="Directory for storing profiling reports"
     )
     
     parser.add_argument(
@@ -97,9 +116,14 @@ def validate_args(args: argparse.Namespace) -> bool:
     Returns:
         True if arguments are valid, False otherwise
     """
-    # Check if input directory exists
-    if not os.path.isdir(args.input_dir):
-        logging.error(f"Input directory does not exist: {args.input_dir}")
+    # Create directories if they don't exist
+    os.makedirs(args.input_dir, exist_ok=True)
+    os.makedirs(args.output_dir, exist_ok=True)
+    os.makedirs(args.reports_dir, exist_ok=True)
+    
+    # Check if input directory has any files
+    if not os.listdir(args.input_dir):
+        logging.warning(f"Input directory is empty: {args.input_dir}")
         return False
     
     # Check if resize dimensions are valid
@@ -108,6 +132,11 @@ def validate_args(args: argparse.Namespace) -> bool:
         return False
     
     return True
+
+def get_report_filename() -> str:
+    """Generate a timestamped filename for the profiling report."""
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    return f"profiling_report_{timestamp}.json"
 
 def main(args: Optional[List[str]] = None) -> int:
     """
@@ -129,16 +158,22 @@ def main(args: Optional[List[str]] = None) -> int:
         return 1
     
     try:
+        # Initialize profiler
+        report_path = os.path.join(parsed_args.reports_dir, get_report_filename())
+        profiler = ProcessingProfiler(report_path)
+        
         # Process images
-        processor = ImageProcessor(parsed_args.input_dir, parsed_args.output_dir)
-        processor.process_images(
-            resize_dimensions=parsed_args.resize,
-            blur_radius=parsed_args.blur,
-            sharpen_factor=parsed_args.sharpen,
-            contrast_factor=parsed_args.contrast,
-            brightness_factor=parsed_args.brightness
-        )
-        logging.info("Image processing completed successfully")
+        with profiler:
+            processor = ImageProcessor(parsed_args.input_dir, parsed_args.output_dir)
+            processor.process_images(
+                resize_dimensions=parsed_args.resize,
+                blur_radius=parsed_args.blur,
+                sharpen_factor=parsed_args.sharpen,
+                contrast_factor=parsed_args.contrast,
+                brightness_factor=parsed_args.brightness
+            )
+        
+        logging.info(f"Image processing completed successfully. Profiling report saved to: {report_path}")
         return 0
     except Exception as e:
         logging.error(f"Error during image processing: {str(e)}")
