@@ -1,0 +1,42 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+.env/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Project specific directories
+data/input/*
+data/output/*
+reports/*
+
+# Keep the directories but not their contents
+!data/input/.gitkeep
+!data/output/.gitkeep
+!reports/.gitkeep
+
+# Logs
+*.log
