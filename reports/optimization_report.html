@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Processor Optimization Report</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        header {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            border-left: 5px solid #28a745;
+        }
+        .chart-container {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f5f5f5;
+        }
+        .improvement {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .regression {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .code-block {
+            background-color: #f8f9fa;
+            border-left: 3px solid #007bff;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+        .technique {
+            background-color: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .technique h4 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        .summary-box {
+            background-color: #e9f7ef;
+            border-left: 5px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Image Processor Optimization Report</h1>
+        <p>Generated on: 2025-03-10 20:40:35 UTC</p>
+    </header>
+
+    <div class="summary-box">
+        <h2>Executive Summary</h2>
+        <p>This report analyzes the performance improvements achieved by optimizing the image processing application. The optimized version shows significant performance gains in processing speed and CPU efficiency.</p>
+        <p><strong>Key Improvements:</strong></p>
+        <ul>
+            <li>Processing time reduced by <span class="improvement">61.5%</span></li>
+            <li>CPU usage reduced by <span class="improvement">37.7%</span></li>
+            <li>Memory usage increased to support parallel processing</li>
+        </ul>
+    </div>
+
+    <h2>Performance Comparison</h2>
+    <div class="chart-container">
+        <div id="timeChart" style="height: 400px;"></div>
+    </div>
+
+    <div class="chart-container">
+        <div id="resourceChart" style="height: 400px;"></div>
+    </div>
+
+    <div class="chart-container">
+        <div id="iterationChart" style="height: 400px;"></div>
+    </div>
+
+    <h2>Detailed Results</h2>
+    <table>
+        <tr>
+            <th>Metric</th>
+            <th>Original</th>
+            <th>Optimized</th>
+            <th>Improvement</th>
+        </tr>
+        <tr>
+            <td>Average Processing Time</td>
+            <td>2.62s</td>
+            <td>1.01s</td>
+            <td class="improvement">61.5% faster</td>
+        </tr>
+        <tr>
+            <td>CPU Usage</td>
+            <td>2.20s</td>
+            <td>1.37s</td>
+            <td class="improvement">37.7% less</td>
+        </tr>
+        <tr>
+            <td>Memory Usage</td>
+            <td>0.04 MB</td>
+            <td>34.63 MB</td>
+            <td class="regression">Increased for parallel processing</td>
+        </tr>
+    </table>
+
+    <h2>Optimization Techniques Applied</h2>
+    
+    <div class="technique">
+        <h4>1. Eliminated Redundant I/O Operations</h4>
+        <p>The original implementation loaded and saved images multiple times during processing. The optimized version loads each image only once, applies all transformations in sequence, and saves only at the end.</p>
+        <div class="code-block">
+            <pre>
+# Original approach (inefficient)
+image = Image.open(input_path)
+image = image.resize(resize_dimensions)
+image.save(output_path)  # Intermediate save
+
+image = Image.open(output_path)  # Redundant load
+image = image.filter(ImageFilter.GaussianBlur(blur_radius))
+image.save(output_path)  # Intermediate save
+
+# Optimized approach
+image = Image.open(input_path)  # Load once
+image = image.resize(resize_dimensions)
+image = image.filter(ImageFilter.GaussianBlur(blur_radius))
+# Apply other transformations...
+image.save(output_path)  # Save once at the end</pre>
+        </div>
+    </div>
+
+    <div class="technique">
+        <h4>2. Implemented Parallel Processing</h4>
+        <p>The optimized version processes multiple images concurrently using Python's concurrent.futures module, significantly reducing total processing time.</p>
+        <div class="code-block">
+            <pre>
+with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+    futures = {
+        executor.submit(
+            self._process_single_image,
+            filename,
+            resize_dimensions,
+            blur_radius,
+            sharpen_factor,
+            contrast_factor,
+            brightness_factor
+        ): filename for filename in image_files
+    }
+    
+    for future in concurrent.futures.as_completed(futures):
+        filename = futures[future]
+        try:
+            future.result()
+        except Exception as e:
+            logger.error(f"Error processing {filename}: {str(e)}")</pre>
+        </div>
+    </div>
+
+    <div class="technique">
+        <h4>3. Added Format Optimization</h4>
+        <p>The optimized version detects the image format and applies format-specific optimizations when saving.</p>
+    </div>
+
+    <div class="technique">
+        <h4>4. Implemented Caching</h4>
+        <p>Added caching for repeated operations using Python's lru_cache decorator.</p>
+    </div>
+
+    <div class="technique">
+        <h4>5. Applied Batch Processing of Transformations</h4>
+        <p>All transformations are applied in sequence without intermediate file operations.</p>
+    </div>
+
+    <h2>Conclusion</h2>
+    <p>The optimization efforts have resulted in significant performance improvements. The processing time has been reduced by 61.5%, and CPU usage has decreased by 37.7%. While memory usage has increased to support parallel processing, this is an acceptable trade-off given the substantial performance gains.</p>
+    
+    <p>The optimized implementation successfully addresses all the inefficiencies identified in the original code, making the image processor more efficient and scalable.</p>
+
+    <script src="optimization_data.js"></script>
+    <script src="optimization_charts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initCharts();
+        });
+    </script>
+</body>
+</html>
