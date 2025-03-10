@@ -78,6 +78,33 @@ To set up the development environment:
    pip install -e ".[dev]"
    ```
 
+### Testing with Generated Images
+
+For testing and profiling, you can use the included script to generate test images:
+
+```bash
+./generate_test_images.sh
+```
+
+This script will:
+- Check if the input directory is empty
+- Generate test images if needed
+- Install the package if the command is not available
+
+### Profiling
+
+To profile the image processor performance:
+
+```bash
+# Basic profiling with time measurement
+image-processor -i data/input -o data/output
+
+# Memory profiling
+python -m memory_profiler profile_script.py
+```
+
+Profiling reports are saved to `~/.local/lib/python3.10/reports/` by default.
+
 ## License
 
 MIT License
