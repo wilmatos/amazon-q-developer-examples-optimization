@@ -1,0 +1,71 @@
+schemaVersion: 2.2.0
+metadata:
+  name: image-processor
+  version: 1.0.0
+  displayName: Image Processing Application
+  description: Python application for image processing with optimization opportunities
+  tags:
+    - python
+    - image-processing
+    - optimization
+
+components:
+  - name: python
+    container:
+      image: python:3.10
+      memoryLimit: 2Gi
+      mountSources: true
+      env:
+        - name: PYTHONPATH
+          value: ${PROJECT_SOURCE}
+
+commands:
+  - id: install
+    exec:
+      component: python
+      commandLine: |
+        python -m venv .venv
+        source .venv/bin/activate
+        pip install --upgrade pip
+        pip install -e ".[dev]"
+      workingDir: ${PROJECT_SOURCE}
+      group:
+        kind: build
+        isDefault: true
+
+  - id: build
+    exec:
+      component: python
+      commandLine: |
+        source .venv/bin/activate
+        pip install -e .
+        mkdir -p data/input data/output reports
+        touch data/input/.gitkeep data/output/.gitkeep reports/.gitkeep
+        chmod +x generate_test_images.sh
+        ./generate_test_images.sh
+      workingDir: ${PROJECT_SOURCE}
+      group:
+        kind: build
+
+  - id: test
+    exec:
+      component: python
+      commandLine: |
+        source .venv/bin/activate
+        pytest -xvs tests/
+        python -m memory_profiler profile_script.py
+        image-processor -i data/input -o data/output
+      workingDir: ${PROJECT_SOURCE}
+      group:
+        kind: test
+        isDefault: true
+
+  - id: profile
+    exec:
+      component: python
+      commandLine: |
+        source .venv/bin/activate
+        python profile_detailed.py
+      workingDir: ${PROJECT_SOURCE}
+      group:
+        kind: test
