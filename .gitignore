@@ -38,5 +38,9 @@ reports/*
 !data/output/.gitkeep
 !reports/.gitkeep
 
+# Documentation build
+docs/_build/
+docs/api/_autosummary/
+
 # Logs
 *.log
