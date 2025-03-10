@@ -52,20 +52,15 @@ commands:
       component: python
       commandLine: |
         source .venv/bin/activate
+        # Run unit tests
         pytest -xvs tests/
+        # Run basic profiling
         python -m memory_profiler profile_script.py
+        # Run CLI profiling
         image-processor -i data/input -o data/output
-      workingDir: ${PROJECT_SOURCE}
-      group:
-        kind: test
-        isDefault: true
-
-  - id: profile
-    exec:
-      component: python
-      commandLine: |
-        source .venv/bin/activate
+        # Run detailed profiling
         python profile_detailed.py
       workingDir: ${PROJECT_SOURCE}
       group:
         kind: test
+        isDefault: true
