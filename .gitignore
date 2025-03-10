@@ -1,42 +1,50 @@
-# Python bytecode
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
-
-# Distribution / packaging
-dist/
+*.so
+.Python
 build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
 *.egg-info/
+.installed.cfg
 *.egg
 
-# Virtual environments
+# Virtual Environment
 venv/
-env/
 ENV/
-.env/
+env/
 
-# Testing
-.pytest_cache/
-.coverage
-htmlcov/
-.tox/
-
-# IDE specific files
+# IDE
 .idea/
 .vscode/
 *.swp
 *.swo
-.DS_Store
 
-# Project specific directories
-data/input/*
-data/output/*
-reports/*
-
-# Keep the directories but not their contents
-!data/input/.gitkeep
-!data/output/.gitkeep
-!reports/.gitkeep
-
-# Logs
+# Logs and databases
 *.log
+*.sqlite
+
+# Test coverage
+.coverage
+htmlcov/
+
+# Generated test data and output
+data/input/*
+!data/input/.gitkeep
+data/output/*
+!data/output/.gitkeep
+
+# Reports
+reports/*
+!reports/.gitkeep
