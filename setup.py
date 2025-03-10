@@ -31,6 +31,9 @@ setup(
     python_requires=">=3.7",
     install_requires=[
         "Pillow>=9.0.0",
+        "psutil>=5.9.0",
+        "matplotlib>=3.5.0",
+        "memory_profiler>=0.60.0",
     ],
     entry_points={
         "console_scripts": [
